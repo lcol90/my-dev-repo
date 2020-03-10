@@ -1,0 +1,17 @@
+
+#UDF with custom parameters
+
+from pyspark.sql.functions import udf
+from pyspark.sql.types import *
+
+def myfun(ranges):
+  def binning(x):
+      bins = np.cumsum(np.diff(ranges))
+      for idx in range(len(ranges)-1):
+        if ranges[idx] <= x < ranges[idx+1]:
+          x = bins[idx]
+      return float(x)
+  return binning
+  
+binning_udf = udf(myfun(speed_ranges), FloatType())
+display(df.select("speed", binning_udf("speed")))
